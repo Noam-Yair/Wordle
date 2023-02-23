@@ -45,6 +45,9 @@ th {
   width: 10vh;
   height: 7vh;
   border: ridge;
+  margin: 4px;
+  text-align: center;
+  border-radius: 10%;
 }
 
 .keyboard{
