@@ -15,16 +15,15 @@
 
 table{
   display: flex;
-  position: relative;
-  width: 88vh;
+  align-items: center;
+  justify-content: center;
+  width: 88vw;
   height: 44vh;
   margin: auto;
   background: none;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   flex-direction: column;
-  align-content: stretch;
-  justify-content: space-evenly;
-  align-items: center;
+  align-content: center;
 }
 
 tbody{
@@ -38,7 +37,7 @@ tbody{
 
 tr{
   display: flex;
-  width: 50vh;
+  /*width: 39vw;*/
 }
 
 th {
