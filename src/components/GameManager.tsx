@@ -3,7 +3,8 @@ import {useState, useEffect} from 'react'
 import Grid from "./Grid"
 import Header from './Header'
 import Keyboard from "./Keyboard"
-import Snackbar, { SnackbarOrigin } from '@mui/material/Snackbar';
+import Snackbar from '@mui/material/Snackbar';
+import { Report } from 'notiflix/build/notiflix-report-aio';
 
 function GameManager() {
 
@@ -14,8 +15,8 @@ function GameManager() {
     const [previousWords, setPreviousWords] = useState([])
     const [word, setWord] = useState('');
     const [open, setOpen] = useState(false);
-    const [alertMessage, setAlertMessage] = useState("");
     const [fetchWord, setFetchWord] = useState(true);
+    const [win, setWin] = useState(0);
 
     var secretWordLetters = word !=='' ? word.split("") : [];
 
@@ -50,30 +51,21 @@ function GameManager() {
         }
     }
   }
-
   async function checkForWord(){
       let guessWord = selectedLetters.join('');
       if (guessWord.length < 5){
           setOpen(true);
-          setAlertMessage("Guessed word must include 5 letters")
+          setWin(3)
+          // setAlertMessage("Guessed word must include 5 letters")
       }
       else if (guessWord === word){
-          // await new Promise(resolve => setTimeout(resolve, 3000));
-          setTimeout(() => {
-              setOpen(true);
-              setAlertMessage("You Won!")
-              setFetchWord(true);
-          }, 2000);
+          setOpen(true);
+          setWin(1);
+          setFetchWord(true);
       }
       else if (previousWords.length === 5){
-          await new Promise(resolve => setTimeout(resolve, 3000));
           setOpen(true)
-          setRow(0)
-          setColumn(-1);
-          setAlertMessage("You lost");
-          setSelectedLetters([])
-          setLetter("")
-          setPreviousWords([])
+          setWin(2)
       }
       else {
         setRow(++curRow)
@@ -95,9 +87,20 @@ function GameManager() {
       }
   }
 
+  const endGame = () =>{
+      setWin(0);
+      fetchData();
+      setRow(0)
+      setColumn(-1);
+      setSelectedLetters([])
+      setLetter("")
+      setPreviousWords([])
+  }
+
     const handleClose = () => {
         setOpen(false)
     };
+
   return (
         <>
         <Header/>
@@ -105,13 +108,26 @@ function GameManager() {
         <Keyboard select={setLetter} selected={letter} curCol={curColumn} setColumn={setColumn}
                   setRow={setRow} handleSubmit={checkForWord}
                   handleErase={handleErase} selectedLetters={previousWords}/>
-            {open ? <Snackbar
+            {open && win===1 ? Report.success(
+                'You won!',
+                '',
+                'Okay',
+                (()=> endGame())
+            ) : <div/>}
+            {open && win===2 ? Report.failure(
+                'You failed',
+                'The correct word was ' +  secretWordLetters.join(''),
+                'Okay',
+                (()=> endGame())
+            ) : <div/>}
+            {open && win===3 ? <Snackbar
                 anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
                 open={open}
                 onClose={handleClose}
-                message={alertMessage}
+                message="Guessed word must include 5 letters"
                 key={'snackbar'}
-            /> : <div/>}
+            />  : <div/>}
+
         </>
       );
 }
